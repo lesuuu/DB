@@ -1,4 +1,3 @@
-
 CREATE TABLE Customers (
     customer_id SERIAL PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -79,17 +78,79 @@ LEFT JOIN Orders o ON c.customer_id = o.customer_id;
 SELECT p.product_name, oi.quantity, oi.price_per_unit FROM orders o
 JOIN order_items oi ON o.order_id = oi.order_id
 JOIN products p ON p.product_id = oi.product_id
- WHERE o.order_id = 1;
+WHERE o.order_id = 1;
 --4
 
-SELECT * 
-FROM customers
-WHERE customer_id IN (SELECT order_id FROM Orders);
+SELECT full_name
+FROM Customers 
+WHERE customer_id IN (
+    SELECT o.customer_id
+    FROM Orders o
+    JOIN Order_items oi  ON o.order_id = oi.order_id
+    JOIN Products p  ON oi.product_id = p.product_id
+    WHERE p.product_name = 'Смартфон'
+);
+--5
+SELECT product_name, price 
+FROM products 
+WHERE  price > (SELECT AVG(price) FROM Products);
+ --6
+ SELECT o.order_id
+ from orders o
+ WHERE EXISTS (
+    SELECT 1
+    from order_items oi
+    JOIN products p ON oi.product_id = p.product_id
+    WHERE oi.order_id = o.order_id AND price > 100000 
+ );
+--7 1
+SELECT full_name
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.customer_id
+LEFT JOIN order_items oi  ON oi.order_id = o.order_id
+LEFT JOIN products p ON p.product_id = oi.product_id AND p.product_name = 'Ноутбук'
+WHERE p.product_id is NULL;
+--7 2
+SELECT full_name
+FROM Customers c
+WHERE customer_id NOT IN (
+    SELECT o.customer_id
+    FROM Orders o
+    JOIN Order_items oi  ON o.order_id = oi.order_id
+    JOIN Products p  ON oi.product_id = p.product_id
+    WHERE p.product_name = 'Ноутбук'
+);
+--8
+SELECT p.product_name
+FROM order_items oi
+RIGHT JOIN products p ON oi.product_id = p.product_id
+WHERE oi.order_item_id IS NULL;
+--9
+SELECT c.full_name, p.product_name, oi.quantity
+FROM customers c
+FULL OUTER JOIN orders o ON o.customer_id = c.customer_id
+FULL OUTER JOIN order_items oi  ON oi.order_id = o.order_id
+FULL OUTER JOIN products p ON p.product_id = oi.product_id;
+--10
+SELECT c.full_name
+FROM customers c
+JOIN orders o ON o.customer_id = c.customer_id
+JOIN order_items oi  ON oi.order_id = o.order_id
+JOIN products p ON p.product_id = oi.product_id
+WHERE p.price = (SELECT MAX(price) FROM Products);
+--11
+SELECT c.full_name, p.category 
+FROM customers c
+CROSS JOIN (
+SELECT category
+FROM products ) p;
 
-SELECT product_id, order_id
-FROM Order_Items
-
-select customer_id, order_id
-from orders;
-SELECT customer_id
-from orders;
+--12
+--Используя `SELF JOIN` на таблице `Customers`, выведите список покупателей и тех, 
+--кто их порекомендовал. Результат должен содержать два столбца: `new_customer` (имя нового покупателя) и `recommended_by`
+-- (имя того, кто его порекомендовал).
+SELECT 
+   niw.full_name as niw_customer,
+   rec.full_name as recommended_by
+from customers niw 
+JOIN customers rec on niw.recommended_by = rec.customer_id;
