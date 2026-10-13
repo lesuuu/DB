@@ -154,3 +154,66 @@ SELECT
    rec.full_name as recommended_by
 from customers niw 
 JOIN customers rec on niw.recommended_by = rec.customer_id;
+
+
+--лаба 9
+--1
+SELECT 
+    category,
+    COUNT(product_id) AS products_in_category
+FROM products
+GROUP BY category;
+
+--2
+SELECT 
+   SUM(quantity * price_per_unit) as suum
+from order_items;
+
+--3
+SELECT
+    c.full_name,
+    COUNT(order_id) AS orders_count
+FROM Customers c
+LEFT JOIN Orders o ON c.customer_id = o.customer_id
+GROUP BY c.full_name;
+
+--4
+SELECT
+    AVG(order_total) AS avg_chek
+FROM (
+    SELECT order_id, SUM(quantity * price_per_unit) AS order_total
+    FROM order_items
+    GROUP BY order_id)
+AS order_sum;
+
+--5
+SELECT status,
+    COUNT(order_id) AS count_order
+from orders
+GROUP BY status;
+
+--6
+SELECT category,
+    count(product_id) AS product_in_category
+FROM products
+GROUP BY category
+HAVING count(product_id)>1;
+
+--7
+SELECT
+    c.full_name,
+    COUNT(order_id) AS orders_count
+FROM Customers c
+LEFT JOIN Orders o ON c.customer_id = o.customer_id
+GROUP BY c.full_name
+HAVING COUNT(order_id)>1;
+
+--8
+SELECT
+    product_name,
+    COUNT(quantity) as count_product,
+    MAX(quantity) as maax
+FROM order_items oi
+JOIN products p ON p.product_id = oi.product_id
+GROUP BY product_name
+HAVING COUNT(quantity)>MAX(quantity);
