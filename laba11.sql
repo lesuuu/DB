@@ -147,7 +147,20 @@ CREATE TABLE RoomBookings (
     event_name VARCHAR(255),
     event_type VARCHAR(50)
 );
+--event_type зависит от room_name это ошибка потому что создается избыточность информаци, нам придется каждый раз писать и тип 
+--ивента и комнату, которые будут посторяться 
+--что бы это исправить надо просто создать отдельную таблицу для комнат и типа мероприятий 
 
+CREATE TABLE RoomBookings (
+    booking_time DATETIME,
+    event_name VARCHAR(255),
+    event_type VARCHAR(50) FOREIGN KEY 
+);
+
+CREATE TABLE Event_room (
+    room_name VARCHAR(100) NOT NULL,
+    event_type VARCHAR(50) PRIMARY KEY
+);
 
 
 
